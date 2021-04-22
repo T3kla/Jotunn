@@ -1,0 +1,191 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Getting started </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Getting started ">
+    <meta name="generator" content="docfx 2.56.7.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="getting-started">Getting started</h1>
+
+<p>If you already have a mod for Valheim and want to switch to Jötunn or did use legacy JötunnLib or ValheimLib before all you need to do is to install the latest release of Jötunn from <a href="https://www.nuget.org/packages/JotunnLib">nuget.org</a> into your project and start using it. Jötunn uses <a href="https://github.com/MonoMod/MonoMod">MMHooks</a>, so make sure you have build the detour dlls and reference them in your project.</p>
+<p>Jötunn offers some PreBuild tasks to automate certain housekeeping duties for you. Skip the first part if you already have an environment setup but still want to learn about the automations.</p>
+<p>If you want step-by-step instructions to start a Valheim mod from scratch using Jötunn continue reading as we guide you through the process of setting up everything you need to get going.</p>
+<h2 id="development-environment">Development Environment</h2>
+<ul>
+<li><p>We begin by downloading <a href="https://valheim.thunderstore.io/package/denikson/BepInExPack_Valheim/">BepInEx for Valheim</a> and extract the zip file into your root Valheim directory.</p>
+</li>
+<li><p>Inside the visual studio installer, ensure that <code>.NET Desktop Development</code> and <code>.NET Core Cross-Platform Development</code> are installed, then click on the <code>Individual Components</code> tab and select <code>.NET Framework 4.6.2</code>:<br>
+<img src="../Documentation/images/getting-started/vs-InstallerComponents.png" alt="Components"></p>
+</li>
+<li><p>Fork our <a href="https://github.com/Valheim-Modding/JotunnModStub">ModStub</a> from github, and copy the link to the git<br>
+<img src="../Documentation/images/getting-started/gh-ForkedStub.png" alt="Forked github stub"></p>
+</li>
+<li><p>In visual studio, in the right hand toobar, select <code>Git Changes</code>, and then <code>Clone Repository</code>, and paste the URL provided by the previous step. Name your project and place it accordingly.<br>
+<img src="../Documentation/images/getting-started/vs-CloneForkedStub.png" alt="VS Clone forked stub"></p>
+</li>
+</ul>
+<h2 id="setting-up-jötunn-prebuild-automations">Setting up Jötunn PreBuild automations</h2>
+<h3 id="add-project-references">Add project references</h3>
+<p>Jötunn can automatically set references to all important libraries needed to mod the game on your project. To use this feature browse to your solution directory. Create a new file called <code>Environment.props</code> and place the following contents inside, modifying your <code>&lt;VALHEIM_INSTALL&gt;</code> to point to your game directory. This sets up references in your project to BepInEx, the publicized dlls, the unstripped corlibs from Unity and MMHook dlls.</p>
+<pre><code class="lang-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;Project ToolsVersion=&quot;Current&quot; xmlns=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot;&gt;
+  &lt;PropertyGroup&gt;
+    &lt;!-- Needs to be your path to the base Valheim folder --&gt;
+    &lt;VALHEIM_INSTALL&gt;X:\PathToYourSteamLibary\steamapps\common\Valheim&lt;/VALHEIM_INSTALL&gt;
+  &lt;/PropertyGroup&gt;
+&lt;/Project&gt;
+</code></pre><p><strong>WARNING:</strong> <em>This prebuild task will add references to your current project. If you already have setup that references it most certainly will duplicate them.</em></p>
+<h3 id="publicize-and-mmhook-valheim-assemblies">Publicize and MMHook Valheim assemblies</h3>
+<p>If you want the publicised and MMHOOK dlls automatically created, then set <code>ExecutePrebuild</code> in <a href="https://github.com/Valheim-Modding/JotunnModStub/blob/master/DoPrebuild.props">DoPrebuild.props</a> to true. Create that file if you are not using the ModStub but still want Jötunn to create the Hooks for you. If you opt not to utilise this automation, it is suggested that you generate your method detours and publicised assemblies, and add them to your projects references manually.</p>
+<pre><code class="lang-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;Project ToolsVersion=&quot;Current&quot; xmlns=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot;&gt;
+  &lt;PropertyGroup&gt;
+    &lt;ExecutePrebuild&gt;true&lt;/ExecutePrebuild&gt;
+  &lt;/PropertyGroup&gt;
+&lt;/Project&gt;
+</code></pre><p><strong>WARNING:</strong> <em>This prebuild task will automate the generation of monomod method detours and publicising of game assemblies. By enabling this, you understand that you will be generating new publicised assemblies and method detours upon PreBuild **IF</em>* the binaries have been updated since the last time the PreBuild has run.*</p>
+<h3 id="manual-setup">Manual setup</h3>
+<p>If for whatever reason you disable the prebuild, you will need to:</p>
+<ul>
+<li>acquire and install <a href="https://valheim.thunderstore.io/package/ValheimModding/HookGenPatcher/">HookGen</a></li>
+<li>launch the game to generate event wrappers</li>
+<li>add the <code>/BepInEx/plugins/MMHook/assembly_*</code> files to your project references. </li>
+<li>grab the <a href="https://github.com/CabbageCrow/AssemblyPublicizer">Assembly Publicizer</a> <em>(drag drop your `/BepInEx/plugins/MMHook/assembly_</em>` files ontop of the publiciser)* and add the resulting assemblies to your stub project.</li>
+<li>Build the stub, make sure it compiles and automates the postbuild tasks, producing compiled binaries in your plugin directory <code>BepInEx/plugins/yourtestmod/</code> folder and also generated a <code>yourtestmod.dll.mdb</code> monodebug symbols file.</li>
+<li>You may now proceed to one of the <a href="intro.html">Tutorials</a></li>
+</ul>
+<h2 id="customising-your-project">Customising your project</h2>
+<ul>
+<li><p>Once you have your base project, select the solution in the solution explorer, hit F2 to rename the solution as required. Rename your plugin project, an all namespace references, then right click your project settings and ensure the assembly name has also been changed.</p>
+</li>
+<li><p>Rename the <code>PluginGUID</code> <code>PluginName</code>, and <code>PluginVersion</code> to match your intended base release metadata. Your PluginGUID should contain your github username/organisation.</p>
+</li>
+<li><p>Grab the <a href="https://github.com/Valheim-Modding/JotunnModStub/blob/master/JotunnModStub.zip">Project Template</a> which you can use to add new projects to your current solution, based on the mod stub boilerplate.</p>
+</li>
+<li><p>Place the project template into your<br>
+<img src="../Documentation/images/getting-started/vs-ProjectTemplateLocationpng.png" alt="VS Project Template Location"></p>
+</li>
+<li><p>Restart visual studio. You can now create a new project using the imported templated. Right click your solution, add, new project, then scroll to the bottom where you will find the template:<br>
+<img src="../Documentation/images/getting-started/vs-CreateNewProjectTemplate.png" alt="Create new project template"></p>
+</li>
+<li><p>Your project base is now ready for use! You can proceed to <a href=""></a> or select a specific section to learn about from our <a href="">Tutorials</a></p>
+</li>
+</ul>
+<h1 id="post-build-automations">Post Build automations</h1>
+<p>Included in the ModStub and ModExample repos is a PowerShell script <code>publish.ps1</code>. The script is referenced in the project file as a post build event. Depending on the chosen configuration in Visual Studio the script executes the following actions.</p>
+<h2 id="building-debug">Building Debug</h2>
+<ul>
+<li>The compiled dll file for this project is copied to <code>&lt;ValheimDir&gt;\BepInEx\plugins</code>.</li>
+<li>A .mdb file is generated for the compiled project dll and copied to <code>&lt;ValheimDir&gt;\BepInEx\plugins</code>.</li>
+<li><code>&lt;ValheimModStub&gt;\libraries\Debug\mono-2.0-bdwgc.dll</code> is copied to <code>&lt;ValheimDir&gt;\MonoBleedingEdge\EmbedRuntime</code> replacing the original file (a backup is created before).</li>
+</ul>
+<h2 id="building-release">Building Release</h2>
+<ul>
+<li>The README.md in <code>SolutionDir/ProjectDir/package/README.md</code> is copied to <code>SolutionDir/ProjectDir/README.md</code> so that it is present and readable in single-solution-multi-project githubs to give an overview of the project.</li>
+<li>The compiled binary is placed inside of <code>SolutionDir/ProjectDir/package/plugins</code></li>
+<li>The contents of <code>SolutionDir/ProjectDir/package/*</code> is archived into a zip, ready for thunderstore upload.</li>
+</ul>
+<h2 id="debugging-with-visual-studio">Debugging with Visual Studio</h2>
+<p>Please see: <a href="https://github.com/Valheim-Modding/Wiki/wiki/Debugging-Plugins-via-IDE">this article</a></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/Valheim-Modding/Jotunn/blob/51c9fcf56710516661c2146effdf62ea682045c9/JotunnLib/Documentation/tutorials/getting-started.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
